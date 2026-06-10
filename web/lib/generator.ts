@@ -118,7 +118,7 @@ export const ARC_ROLES: Record<number, string> = {
   15: "Outro / Epilogue — penutup, callback ke lagu 1, lingkaran ditutup",
 };
 
-export const SYSTEM_PROMPT = `You are LyricForge — an expert songwriter and music AI prompt engineer.
+export const SYSTEM_PROMPT = `You are SongArc — an expert songwriter and music AI prompt engineer.
 
 Your job:
 1. Generate complete song lyrics in the requested language/bahasa

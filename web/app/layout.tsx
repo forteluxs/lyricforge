@@ -6,8 +6,8 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LyricForge — AI Song Generator",
-  description: "Generate professional song lyrics + Suno AI prompt",
+  title: "SongArc — Where Inspiration Meets Intelligence",
+  description: "Generate professional song lyrics with structural prompts",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

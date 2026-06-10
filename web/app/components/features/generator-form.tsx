@@ -26,10 +26,10 @@ export function GeneratorForm({ state, actions }: GeneratorFormProps) {
       <div className="space-y-6">
         {/* Genre */}
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-zinc-300 ml-1">Genre Musik</label>
+          <label className="text-sm font-semibold text-zinc-300 ml-1">Music Genre</label>
           <input
             type="text"
-            placeholder="e.g. Indie Folk, Synthwave, Dangdut Modern..."
+            placeholder="e.g. Indie Folk, Synthwave, Modern Country..."
             value={genre}
             onChange={e => setGenre(e.target.value)}
             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -38,16 +38,16 @@ export function GeneratorForm({ state, actions }: GeneratorFormProps) {
 
         {/* Bahasa */}
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-zinc-300 ml-1">Bahasa Lirik</label>
+          <label className="text-sm font-semibold text-zinc-300 ml-1">Lyric Language</label>
           <div className="relative">
             <select
               value={bahasa}
               onChange={e => setBahasa(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none"
             >
-              <option value="">-- Pilih bahasa --</option>
+              <option value="">-- Select language --</option>
               {BAHASA.map(b => <option key={b} value={b}>{b}</option>)}
-              <option value="__custom__">Lainnya (ketik sendiri)</option>
+              <option value="__custom__">Other (type your own)</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-400">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -58,7 +58,7 @@ export function GeneratorForm({ state, actions }: GeneratorFormProps) {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               type="text"
-              placeholder="Ketik bahasa..."
+              placeholder="Type language..."
               value={customBahasa}
               onChange={e => setCustom(e.target.value)}
               className="w-full mt-2 bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -68,12 +68,12 @@ export function GeneratorForm({ state, actions }: GeneratorFormProps) {
 
         {/* Narasi */}
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-zinc-300 ml-1">Narasi / Tema Cerita</label>
+          <label className="text-sm font-semibold text-zinc-300 ml-1">Narrative / Story Theme</label>
           <textarea
             rows={4}
             value={narasi}
             onChange={e => setNarasi(e.target.value)}
-            placeholder="Ceritakan tentang apa lagu ini..."
+            placeholder="What is this song about..."
             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-zinc-100 resize-y min-h-[120px] focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           />
         </div>
@@ -106,27 +106,27 @@ export function GeneratorForm({ state, actions }: GeneratorFormProps) {
               >
                 <div className="mt-5 space-y-4 bg-black/20 p-5 rounded-2xl border border-white/5">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-indigo-300">Judul Album</label>
+                    <label className="text-xs font-semibold text-indigo-300">Album Title</label>
                     <input
                       type="text"
-                      placeholder="e.g. Antara Tawa dan Air Mata"
+                      placeholder="e.g. Echoes of the Past"
                       value={albumTitle}
                       onChange={e => setAlbumTitle(e.target.value)}
                       className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-indigo-300">Konsep Album (Opsional)</label>
+                    <label className="text-xs font-semibold text-indigo-300">Album Concept (Optional)</label>
                     <input
                       type="text"
-                      placeholder="e.g. Perjalanan emosional dari kehilangan hingga penerimaan"
+                      placeholder="e.g. An emotional journey from loss to acceptance"
                       value={albumConcept}
                       onChange={e => setAlbumConcept(e.target.value)}
                       className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-indigo-300">Posisi Lagu (Jika generate 1 lagu)</label>
+                    <label className="text-xs font-semibold text-indigo-300">Track Position (For single generation)</label>
                     <select
                       value={songPosition}
                       onChange={e => setSongPos(e.target.value)}
@@ -154,7 +154,7 @@ export function GeneratorForm({ state, actions }: GeneratorFormProps) {
             className="relative flex items-center justify-center gap-2 w-full bg-white text-black hover:bg-zinc-200 active:scale-[0.98] disabled:bg-white/10 disabled:text-white/30 disabled:active:scale-100 font-semibold py-4 rounded-xl transition-all text-sm touch-manipulation group overflow-hidden"
           >
             <Wand2 className="w-4 h-4 group-disabled:opacity-50" />
-            {loading ? "Menyusun Lirik..." : albumMode ? "Generate 1 Lagu" : "Generate Lirik"}
+            {loading ? "Drafting Lyrics..." : albumMode ? "Generate 1 Track" : "Generate Lyrics"}
           </button>
 
           {albumMode && (
