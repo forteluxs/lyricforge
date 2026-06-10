@@ -34,14 +34,17 @@ interface SingleResult {
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button onClick={handleCopy}
-      className="text-xs px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition-colors">
+    <button
+      onClick={handleCopy}
+      className="min-h-[36px] min-w-[56px] px-3 py-1.5 rounded-lg bg-zinc-700 active:bg-zinc-500 hover:bg-zinc-600 text-zinc-300 text-xs font-medium transition-colors touch-manipulation"
+    >
       {copied ? "Copied!" : "Copy"}
     </button>
   );
@@ -50,8 +53,8 @@ function CopyButton({ text }: { text: string }) {
 function SectionCard({ title, content, mono = false }: { title: string; content: string; mono?: boolean }) {
   if (!content) return null;
   return (
-    <div className="bg-zinc-800 rounded-xl p-4 space-y-2">
-      <div className="flex items-center justify-between">
+    <div className="bg-zinc-800 rounded-xl p-4 space-y-3">
+      <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{title}</h3>
         <CopyButton text={content} />
       </div>
@@ -72,33 +75,38 @@ function AlbumSongCard({ song }: { song: SongResult }) {
   return (
     <div className={`bg-zinc-800 rounded-xl overflow-hidden border ${isAbyss ? "border-indigo-500/40" : "border-zinc-700"}`}>
       {/* Header row */}
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-zinc-700/50 transition-colors text-left"
+        onKeyDown={e => e.key === "Enter" && setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-700/50 active:bg-zinc-700 transition-colors cursor-pointer touch-manipulation min-h-[52px]"
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="text-xs font-mono text-zinc-500 shrink-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+          <span className="text-xs font-mono text-zinc-500 shrink-0 tabular-nums">
             {String(song.position).padStart(2, "0")}
           </span>
-          <span className="text-xs text-zinc-500 shrink-0 hidden sm:block">
-            {ARC_LABELS[song.position]?.split(" — ")[1]}
-          </span>
-          <span className="text-sm font-semibold text-zinc-100 truncate">
-            {song.judul || <span className="text-zinc-500 italic">Generating…</span>}
-          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-semibold text-zinc-100 truncate leading-tight">
+              {song.judul || <span className="text-zinc-500 italic font-normal">Generating…</span>}
+            </span>
+            <span className="text-xs text-zinc-500 truncate leading-tight mt-0.5">
+              {ARC_LABELS[song.position]?.split(" — ")[1]}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0 ml-2">
+        <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
           {song.judul && <CopyButton text={exportText} />}
-          <span className="text-zinc-500 text-xs">{open ? "▲" : "▼"}</span>
+          <span className="text-zinc-500 text-xs select-none w-4 text-center">{open ? "▲" : "▼"}</span>
         </div>
-      </button>
+      </div>
 
       {/* Expanded content */}
       {open && song.judul && (
         <div className="px-4 pb-4 space-y-3 border-t border-zinc-700 pt-3">
           <SectionCard title="Lirik" content={song.lirik} mono />
-          <div className="bg-zinc-900 rounded-lg p-3 space-y-1">
-            <div className="flex items-center justify-between">
+          <div className="bg-zinc-900 rounded-lg p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Suno Prompt</span>
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-mono ${song.sunoPrompt.length > 190 ? "text-red-400" : "text-zinc-500"}`}>
@@ -121,12 +129,12 @@ function AlbumSongCard({ song }: { song: SongResult }) {
 // ── Skeleton row while generating ─────────────────────────────
 function SkeletonSongCard({ position }: { position: number }) {
   return (
-    <div className="bg-zinc-800 rounded-xl px-4 py-3 flex items-center gap-3 border border-zinc-700 animate-pulse">
-      <span className="text-xs font-mono text-zinc-500 shrink-0">{String(position).padStart(2, "0")}</span>
-      <span className="text-xs text-zinc-500 shrink-0 hidden sm:block">
-        {ARC_LABELS[position]?.split(" — ")[1]}
-      </span>
-      <div className="h-3 bg-zinc-700 rounded w-40" />
+    <div className="bg-zinc-800 rounded-xl px-4 py-3.5 flex items-center gap-3 border border-zinc-700 animate-pulse min-h-[52px]">
+      <span className="text-xs font-mono text-zinc-500 shrink-0 tabular-nums">{String(position).padStart(2, "0")}</span>
+      <div className="flex flex-col gap-1.5 flex-1">
+        <div className="h-3 bg-zinc-700 rounded w-40" />
+        <div className="h-2.5 bg-zinc-700/60 rounded w-24" />
+      </div>
     </div>
   );
 }
@@ -169,7 +177,7 @@ export default function Home() {
 
   // Batch album state
   const [albumLoading, setAlbumLoading]   = useState(false);
-  const [albumProgress, setAlbumProgress] = useState(0);       // current position being generated
+  const [albumProgress, setAlbumProgress] = useState(0);
   const [albumSongs, setAlbumSongs]       = useState<SongResult[]>([]);
   const [albumError, setAlbumError]       = useState("");
   const albumAbort = useRef<AbortController | null>(null);
@@ -282,64 +290,80 @@ export default function Home() {
     setAlbumLoading(false);
   };
 
-  // Songs that have arrived + skeleton for songs still being generated
   const completedPositions = new Set(albumSongs.map(s => s.position));
 
   // ══════════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
-      <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
+      <div className="max-w-2xl mx-auto px-4 py-8 sm:py-10 space-y-6 sm:space-y-8">
 
         {/* Header */}
-        <div className="text-center space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">LyricForge</h1>
+        <div className="text-center space-y-1 pt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">LyricForge</h1>
           <p className="text-zinc-400 text-sm">Generate song lyrics + Suno AI prompt</p>
         </div>
 
         {/* ── Form ── */}
-        <div className="bg-zinc-800 rounded-2xl p-6 space-y-5">
+        <div className="bg-zinc-800 rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5">
 
           {/* Genre */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Genre</label>
-            <input type="text"
-              placeholder="Contoh: Indie Folk, Afrobeats, Dangdut Modern, Bossa Nova, Conscious Rap..."
-              value={genre} onChange={e => setGenre(e.target.value)}
-              className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input
+              type="text"
+              inputMode="text"
+              placeholder="Contoh: Indie Folk, Afrobeats, Dangdut Modern, Bossa Nova..."
+              value={genre}
+              onChange={e => setGenre(e.target.value)}
+              className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
 
           {/* Bahasa */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Bahasa</label>
-            <select value={bahasa} onChange={e => setBahasa(e.target.value)}
-              className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select
+              value={bahasa}
+              onChange={e => setBahasa(e.target.value)}
+              className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+            >
               <option value="">-- Pilih bahasa --</option>
               {BAHASA.map(b => <option key={b} value={b}>{b}</option>)}
               <option value="__custom__">Lainnya (ketik sendiri)</option>
             </select>
             {bahasa === "__custom__" && (
-              <input type="text" placeholder="Ketik bahasa..." value={customBahasa}
+              <input
+                type="text"
+                placeholder="Ketik bahasa..."
+                value={customBahasa}
                 onChange={e => setCustom(e.target.value)}
-                className="w-full mt-1.5 bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                className="w-full mt-1.5 bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
             )}
           </div>
 
           {/* Narasi */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Narasi / Tema</label>
-            <textarea rows={4} value={narasi} onChange={e => setNarasi(e.target.value)}
+            <textarea
+              rows={4}
+              value={narasi}
+              onChange={e => setNarasi(e.target.value)}
               placeholder="Contoh: Lagu tentang kerinduan pada kampung halaman saat merantau ke kota besar..."
-              className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 resize-y min-h-[100px] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
 
           {/* Album Mode */}
           <div className="border-t border-zinc-700 pt-4">
-            <button onClick={() => setAlbumMode(!albumMode)}
-              className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200 transition-colors">
-              <div className={`w-8 h-4 rounded-full transition-colors flex items-center px-0.5 ${albumMode ? "bg-indigo-600" : "bg-zinc-600"}`}>
-                <div className={`w-3 h-3 rounded-full bg-white transition-transform ${albumMode ? "translate-x-4" : "translate-x-0"}`} />
+            <button
+              onClick={() => setAlbumMode(!albumMode)}
+              className="flex items-center gap-3 text-sm text-zinc-400 hover:text-zinc-200 transition-colors touch-manipulation min-h-[36px]"
+            >
+              <div className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 shrink-0 ${albumMode ? "bg-indigo-600" : "bg-zinc-600"}`}>
+                <div className={`w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${albumMode ? "translate-x-4" : "translate-x-0"}`} />
               </div>
-              Album Mode
+              <span>Album Mode</span>
               <span className="text-zinc-600 text-xs">(arc 15 lagu)</span>
             </button>
 
@@ -347,21 +371,31 @@ export default function Home() {
               <div className="mt-4 space-y-3 pl-1">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-400">Judul Album</label>
-                  <input type="text" placeholder="e.g. Antara Tawa dan Air Mata"
-                    value={albumTitle} onChange={e => setAlbumTitle(e.target.value)}
-                    className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <input
+                    type="text"
+                    placeholder="e.g. Antara Tawa dan Air Mata"
+                    value={albumTitle}
+                    onChange={e => setAlbumTitle(e.target.value)}
+                    className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-400">Konsep Album</label>
-                  <input type="text"
+                  <input
+                    type="text"
                     placeholder="e.g. Perjalanan emosional dari kehilangan hingga penerimaan"
-                    value={albumConcept} onChange={e => setAlbumConcept(e.target.value)}
-                    className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    value={albumConcept}
+                    onChange={e => setAlbumConcept(e.target.value)}
+                    className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-400">Posisi Lagu (untuk single generate)</label>
-                  <select value={songPosition} onChange={e => setSongPos(e.target.value)}
-                    className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <select
+                    value={songPosition}
+                    onChange={e => setSongPos(e.target.value)}
+                    className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none"
+                  >
                     {Object.entries(ARC_LABELS).map(([n, l]) => <option key={n} value={n}>{l}</option>)}
                   </select>
                   <p className="text-xs text-zinc-600">
@@ -375,20 +409,26 @@ export default function Home() {
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm bg-red-900/20 rounded-lg px-3 py-2">{error}</p>
+            <p className="text-red-400 text-sm bg-red-900/20 rounded-lg px-3 py-2.5">{error}</p>
           )}
 
           {/* Buttons */}
-          <div className={`grid gap-2 ${albumMode ? "grid-cols-2" : "grid-cols-1"}`}>
-            <button onClick={handleGenerate} disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-colors text-sm">
+          <div className={`grid gap-2.5 ${albumMode ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+            <button
+              onClick={handleGenerate}
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 disabled:bg-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors text-sm touch-manipulation"
+            >
               {loading ? "Generating..." : albumMode ? "Generate 1 Lagu" : "Generate Lagu"}
             </button>
 
             {albumMode && (
-              <button onClick={handleGenerateAlbum} disabled={albumLoading}
-                className="w-full bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-colors text-sm">
-                {albumLoading ? `Generating ${albumProgress}/15...` : "Generate Full Album"}
+              <button
+                onClick={handleGenerateAlbum}
+                disabled={albumLoading}
+                className="w-full bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 disabled:bg-zinc-600 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors text-sm touch-manipulation"
+              >
+                {albumLoading ? `Generating ${albumProgress}/15…` : "Generate Full Album"}
               </button>
             )}
           </div>
@@ -413,10 +453,10 @@ export default function Home() {
             <SectionCard title="Judul Lagu" content={result.judul} />
             <SectionCard title="Lirik" content={result.lirik} mono />
             <div className="bg-zinc-800 rounded-xl p-4 space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Suno Prompt</h3>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs ${result.sunoPrompt.length > 190 ? "text-red-400" : "text-zinc-500"}`}>
+                  <span className={`text-xs font-mono ${result.sunoPrompt.length > 190 ? "text-red-400" : "text-zinc-500"}`}>
                     {result.sunoPrompt.length}/190
                   </span>
                   <CopyButton text={result.sunoPrompt} />
@@ -435,28 +475,32 @@ export default function Home() {
           <div className="space-y-4">
 
             {/* Album header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-zinc-100">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold text-zinc-100 truncate">
                   {albumTitle || "Album"}
                 </h2>
                 {albumLoading
-                  ? <p className="text-xs text-zinc-500">
+                  ? <p className="text-xs text-zinc-500 mt-0.5">
                       Generating track {albumProgress}/15 — {ARC_LABELS[albumProgress]?.split(" — ")[1]}…
                     </p>
-                  : <p className="text-xs text-zinc-500">{albumSongs.length} lagu selesai</p>
+                  : <p className="text-xs text-zinc-500 mt-0.5">{albumSongs.length} lagu selesai</p>
                 }
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 {albumLoading && (
-                  <button onClick={handleCancelAlbum}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition-colors">
+                  <button
+                    onClick={handleCancelAlbum}
+                    className="text-xs px-3 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 active:bg-zinc-500 text-zinc-300 transition-colors touch-manipulation min-h-[36px]"
+                  >
                     Batal
                   </button>
                 )}
                 {!albumLoading && albumSongs.length > 0 && (
-                  <button onClick={() => exportAlbum(albumSongs, albumTitle)}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 text-white transition-colors font-medium">
+                  <button
+                    onClick={() => exportAlbum(albumSongs, albumTitle)}
+                    className="text-xs px-3 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 active:bg-indigo-800 text-white transition-colors font-medium touch-manipulation min-h-[36px]"
+                  >
                     Export .txt
                   </button>
                 )}
@@ -474,10 +518,10 @@ export default function Home() {
             )}
 
             {albumError && (
-              <p className="text-red-400 text-sm bg-red-900/20 rounded-lg px-3 py-2">{albumError}</p>
+              <p className="text-red-400 text-sm bg-red-900/20 rounded-lg px-3 py-2.5">{albumError}</p>
             )}
 
-            {/* Song list — completed songs + skeleton for in-progress */}
+            {/* Song list */}
             <div className="space-y-2">
               {Array.from({ length: 15 }, (_, i) => i + 1).map(pos => {
                 const song = albumSongs.find(s => s.position === pos);
