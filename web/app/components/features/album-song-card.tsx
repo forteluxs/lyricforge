@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { RefreshCw, ChevronDown } from "lucide-react";
 import { SongResult } from "../../types/lyric";
 import { ARC_LABELS } from "../../constants/lyric";
 import { CopyButton } from "../ui/copy-button";
 import { SectionCard } from "../ui/section-card";
 
-export function AlbumSongCard({ song }: { song: SongResult }) {
+interface AlbumSongCardProps {
+  song: SongResult;
+  isReloading?: boolean;
+  onRegenerate?: (position: number) => void;
+}
+
+export function AlbumSongCard({ song, isReloading, onRegenerate }: AlbumSongCardProps) {
   const [open, setOpen] = useState(false);
   const isAbyss = song.position === 8;
 
@@ -28,7 +34,7 @@ export function AlbumSongCard({ song }: { song: SongResult }) {
           </span>
           <div className="flex flex-col min-w-0">
             <span className="text-base font-semibold text-zinc-100 truncate leading-tight">
-              {song.judul || <span className="text-zinc-500 italic font-normal">Generating…</span>}
+              {isReloading ? <span className="text-zinc-500 italic font-normal flex items-center gap-2"><RefreshCw className="w-3 h-3 animate-spin" /> Regenerating…</span> : song.judul || <span className="text-zinc-500 italic font-normal">Generating…</span>}
             </span>
             <span className="text-xs text-zinc-400 truncate leading-tight mt-1">
               {ARC_LABELS[song.position]?.split(" — ")[1]}
@@ -36,7 +42,16 @@ export function AlbumSongCard({ song }: { song: SongResult }) {
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0" onClick={e => e.stopPropagation()}>
-          {song.judul && <CopyButton text={exportText} />}
+          {!isReloading && onRegenerate && (
+            <button 
+              onClick={() => onRegenerate(song.position)}
+              className="flex items-center justify-center min-h-[36px] min-w-[36px] p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-zinc-400 hover:text-indigo-400 transition-all border border-white/5 hover:border-white/10 touch-manipulation"
+              title="Regenerate this track"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          )}
+          {song.judul && !isReloading && <CopyButton text={exportText} />}
           <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
             <ChevronDown className="w-5 h-5 text-zinc-500" />
           </motion.div>

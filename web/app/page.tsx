@@ -34,7 +34,7 @@ export default function Home() {
   const { state, actions } = useLyricGenerator();
   const {
     albumMode, albumTitle, songPosition, error, albumError,
-    loading, result, albumLoading, albumProgress, albumSongs, completedPositions
+    loading, result, albumLoading, albumProgress, albumSongs, completedPositions, reloadingTracks
   } = state;
   const posNum = parseInt(songPosition);
 
@@ -250,7 +250,7 @@ export default function Home() {
                   <div className="space-y-3 pt-2">
                     {Array.from({ length: 15 }, (_, i) => i + 1).map(pos => {
                       const song = albumSongs.find(s => s.position === pos);
-                      if (song) return <AlbumSongCard key={pos} song={song} />;
+                      if (song) return <AlbumSongCard key={pos} song={song} isReloading={reloadingTracks.has(pos)} onRegenerate={actions.handleRegenerateTrack} />;
                       if (albumLoading && pos >= albumProgress && !completedPositions.has(pos)) {
                         return <SkeletonSongCard key={pos} position={pos} />;
                       }

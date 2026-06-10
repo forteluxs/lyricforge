@@ -21,6 +21,7 @@ export function useLyricGenerator() {
   const [albumProgress, setAlbumProgress] = useState(0);
   const [albumSongs, setAlbumSongs] = useState<SongResult[]>([]);
   const [albumError, setAlbumError] = useState("");
+  const [reloadingTracks, setReloadingTracks] = useState<Set<number>>(new Set());
   const albumAbort = useRef<AbortController | null>(null);
 
   const lang = bahasa === "__custom__" ? customBahasa : bahasa;
@@ -130,18 +131,56 @@ export function useLyricGenerator() {
     setAlbumLoading(false);
   };
 
+  const handleRegenerateTrack = async (position: number) => {
+    if (!genre.trim() || !lang || !narasi.trim()) return;
+    setReloadingTracks(prev => new Set(prev).add(position));
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          genre: genre.trim(), bahasa: lang, narasi: narasi.trim(),
+          albumMode: true, albumTitle: albumTitle.trim(),
+          albumConcept: albumConcept.trim(),
+          songPosition: position.toString(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAlbumSongs(prev => {
+          const copy = [...prev];
+          const idx = copy.findIndex(s => s.position === position);
+          if (idx !== -1) {
+            copy[idx] = { position, ...data };
+          } else {
+            copy.push({ position, ...data });
+          }
+          return copy;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setReloadingTracks(prev => {
+        const copy = new Set(prev);
+        copy.delete(position);
+        return copy;
+      });
+    }
+  };
+
   const completedPositions = new Set(albumSongs.map(s => s.position));
 
   return {
     state: {
       genre, bahasa, customBahasa, narasi, albumMode, albumTitle, albumConcept, songPosition,
       loading, error, result,
-      albumLoading, albumProgress, albumSongs, albumError,
+      albumLoading, albumProgress, albumSongs, albumError, reloadingTracks,
       lang, posNum, completedPositions
     },
     actions: {
       setGenre, setBahasa, setCustom, setNarasi, setAlbumMode, setAlbumTitle, setAlbumConcept, setSongPos,
-      handleGenerate, handleGenerateAlbum, handleCancelAlbum
+      handleGenerate, handleGenerateAlbum, handleCancelAlbum, handleRegenerateTrack
     }
   };
 }
