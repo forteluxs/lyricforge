@@ -153,13 +153,29 @@ Output format (use exactly these headers):
 `;
 
 export function parseResult(text: string) {
-  const get = (key: string) =>
-    text.match(new RegExp(`##\\s*${key}\\s*\\n([\\s\\S]*?)(?=##|$)`))?.[1]?.trim() || "";
+  const get = (key: string) => {
+    // Regex that is case-insensitive, allows # or ## or ###, optional **bolding**, optional colon
+    const regex = new RegExp(`(?:^|\\n)(?:#+\\s*|\\*\\*)?${key}(?:\\*\\*)?\\s*:?\\s*\\n([\\s\\S]*?)(?=\\n(?:#+\\s*|\\*\\*)[A-Z]|$)`, "i");
+    return text.match(regex)?.[1]?.trim() || "";
+  };
+
+  let judul = get("JUDUL");
+  let lirik = get("LIRIK");
+  let sunoPrompt = get("SUNO PROMPT") || get("PROMPT") || get("SUNO AI PROMPT");
+  let catatan = get("CATATAN");
+
+  if (!judul && !lirik) {
+    // Fallback if the AI completely ignored headings
+    const lines = text.trim().split("\\n");
+    judul = lines[0].replace(/^[#*]+\\s*/, "").replace(/\\*\\*$/, "").trim();
+    lirik = lines.slice(1).join("\\n").trim();
+  }
+
   return {
-    judul: get("JUDUL"),
-    lirik: get("LIRIK"),
-    sunoPrompt: get("SUNO PROMPT"),
-    catatan: get("CATATAN"),
+    judul: judul || "Gagal Membaca Judul",
+    lirik: lirik || text,
+    sunoPrompt: sunoPrompt || "suno prompt tidak ditemukan",
+    catatan: catatan || "",
     raw: text,
   };
 }
