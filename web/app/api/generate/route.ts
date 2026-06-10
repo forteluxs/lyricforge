@@ -61,21 +61,38 @@ function loadReferences(genre: string): string {
     if (content) context += `\n\n# GENRE VOCABULARY\n` + content;
   }
 
-  // Load novel vocab (all — they're universal)
+  // Load novel vocab — smart select based on genre/language signals
   const novelVocabDir = path.join(REFS_DIR, "novel_vocab");
-  try {
-    const files = fs.readdirSync(novelVocabDir);
-    for (const file of files) {
-      if (file.endsWith(".md")) {
-        const content = readFile(path.join(novelVocabDir, file));
+  const g = genre.toLowerCase();
+  const novelPriority: { file: string; keywords: string[] }[] = [
+    { file: "viral_indo_wattpad.md",      keywords: ["indo", "indonesia", "melayu", "dangdut", "folk indonesia", "pop indonesia", "wattpad"] },
+    { file: "viral_romance_literary.md",  keywords: ["romance", "pop ballad", "indie pop", "r&b", "neo soul", "bedroom pop", "dream pop", "art pop", "romantasy", "fantasy", "k-pop", "opm"] },
+    { file: "viral_manhwa_webtoon.md",    keywords: ["k-pop", "kpop", "j-pop", "jpop", "anime", "manhwa", "fantasy", "epic", "rap", "hip hop", "conscious"] },
+    { file: "indonesian_classics.md",     keywords: ["indo", "indonesia", "melayu", "folk", "pop indonesia", "dangdut"] },
+    { file: "persian_arabic_classics.md", keywords: ["folk", "indie folk", "singer songwriter", "ballad", "sad", "melancholic", "kerinduan"] },
+    { file: "western_classics.md",        keywords: ["rock", "folk rock", "indie rock", "alternative", "country", "americana", "pop", "ballad"] },
+  ];
+  let novelLoaded = 0;
+  for (const { file, keywords } of novelPriority) {
+    if (novelLoaded >= 3) break; // max 3 novel vocab files per request
+    if (keywords.some((kw) => g.includes(kw))) {
+      const content = readFile(path.join(novelVocabDir, file));
+      if (content) {
         context += `\n\n# NOVEL VOCABULARY (${file.replace(".md", "").toUpperCase()})\n` + content;
+        novelLoaded++;
       }
     }
-  } catch {}
+  }
+  // Always include indo wattpad as baseline if nothing matched (most users are Indonesian)
+  if (novelLoaded === 0) {
+    const content = readFile(path.join(novelVocabDir, "viral_indo_wattpad.md"));
+    if (content) context += `\n\n# NOVEL VOCABULARY\n` + content;
+    const content2 = readFile(path.join(novelVocabDir, "viral_romance_literary.md"));
+    if (content2) context += `\n\n# NOVEL VOCABULARY\n` + content2;
+  }
 
   // Load classic lyrics — only country-relevant files based on genre
   const classicDir = path.join(REFS_DIR, "classic_lyrics");
-  const g = genre.toLowerCase();
   const classicPriority = [
     { file: "indonesia.md", keywords: ["indo", "indonesia", "dangdut", "melayu"] },
     { file: "usa.md", keywords: ["folk rock", "hip hop", "rap", "country", "americana", "blues", "soul", "r&b"] },
