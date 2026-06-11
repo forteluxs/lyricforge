@@ -9,6 +9,8 @@ import { CopyButton } from "./components/ui/copy-button";
 import { ARC_LABELS } from "./constants/lyric";
 import { motion, AnimatePresence } from "framer-motion";
 import { Download, XCircle, Music } from "lucide-react";
+import Image from "next/image";
+import { StatsCounter } from "./components/ui/stats-counter";
 import { SongResult } from "./types/lyric";
 
 function exportAlbum(songs: SongResult[], albumTitle: string) {
@@ -75,8 +77,9 @@ export default function Home() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-zinc-400"
+            className="flex items-center justify-center gap-3 text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-zinc-400"
           >
+            <Image src="/logo.png" alt="SongArc Logo" width={56} height={56} className="w-10 h-10 sm:w-14 sm:h-14 object-contain drop-shadow-[0_0_15px_rgba(129,140,248,0.5)]" />
             SongArc
           </motion.h1>
           <motion.p 
@@ -260,9 +263,11 @@ export default function Home() {
                 </motion.div>
               )}
             </AnimatePresence>
-
           </div>
         </div>
+
+        {/* ── Footer Stats ── */}
+        <StatsCounter />
       </div>
     </div>
   );
