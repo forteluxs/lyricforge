@@ -25,9 +25,9 @@
 - **`web/lib/stats.ts`**: Fungsi utilitas untuk membaca dan menulis *stats counter* ke dalam file lokal JSON.
 
 ## Status Deployment (VPS)
-- **Lokasi:** VPS pribadi Ubuntu (IP: `103.253.212.174`).
+- **Lokasi:** VPS pribadi Ubuntu (IP: `xxxxx`).
 - **Domain:** `songarc.my.id` (Dikelola penuh oleh Cloudflare).
-- **Cara Kerja Domain:** Cloudflare *Origin Rules* mengalihkan *traffic* standar dari `https://songarc.my.id` (Port 443) langsung menuju ke Port `3005` di VPS. Hal ini dilakukan karena Port 80 dan 443 di VPS sudah dikuasai oleh `headscale`.
+- **Cara Kerja Domain:** Cloudflare *Origin Rules* mengalihkan *traffic* standar dari `https://songarc.my.id` (Port 443) langsung menuju ke Port `3005` di VPS.
 - **Proses Background:** Aplikasi dijaga agar tetap hidup 24/7 menggunakan **PM2** dengan nama proses `songarc`.
 - **Lokasi Kode di VPS:** `/home/forteluxs/SongArc/web`
 
