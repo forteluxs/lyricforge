@@ -35,6 +35,28 @@ function AnimatedNumber({ value }: { value: number }) {
 }
 
 export function StatsCounter() {
+  const [stats, setStats] = useState({ lyricsForged: 1042, activeCreators: 1005 });
+
+  useEffect(() => {
+    // Increment visitor count if first time
+    const visitKey = "songarc_visited";
+    const isFirstVisit = !localStorage.getItem(visitKey);
+    
+    if (isFirstVisit) {
+      localStorage.setItem(visitKey, "true");
+      fetch("/api/stats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "visitor" })
+      }).then(res => res.json()).then(data => setStats(data)).catch(() => {});
+    } else {
+      fetch("/api/stats")
+        .then(res => res.json())
+        .then(data => setStats(data))
+        .catch(() => {});
+    }
+  }, []);
+
   return (
     <div className="mt-20 pt-10 border-t border-white/5 relative">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
@@ -56,7 +78,7 @@ export function StatsCounter() {
             <Music4 className="w-6 h-6 text-cyan-400" />
           </div>
           <h4 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-cyan-400 mb-1">
-            <AnimatedNumber value={84092} />
+            <AnimatedNumber value={stats.lyricsForged} />
           </h4>
           <p className="text-zinc-500 text-sm tracking-widest uppercase font-semibold">Lyrics Forged</p>
         </motion.div>
@@ -73,7 +95,7 @@ export function StatsCounter() {
             <Users className="w-6 h-6 text-fuchsia-400" />
           </div>
           <h4 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-200 to-fuchsia-400 mb-1">
-            <AnimatedNumber value={12048} />
+            <AnimatedNumber value={stats.activeCreators} />
           </h4>
           <p className="text-zinc-500 text-sm tracking-widest uppercase font-semibold">Active Creators</p>
         </motion.div>

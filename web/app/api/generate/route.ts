@@ -38,6 +38,10 @@ export async function POST(req: NextRequest) {
     });
 
     const text = response.choices[0]?.message?.content || "";
+    
+    // Increment lyrics counter (asynchronous, don't await so it doesn't slow down response)
+    import("@/lib/stats").then(m => m.incrementStats("lyrics", 1)).catch(() => {});
+
     return NextResponse.json(parseResult(text));
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";

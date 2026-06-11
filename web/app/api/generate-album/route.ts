@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
           });
 
           send({ type: "song", ...song });
+          
+          import("@/lib/stats").then(m => m.incrementStats("lyrics", 1)).catch(() => {});
         }
 
         send({ type: "done" });
