@@ -45,6 +45,8 @@ export function loadReferences(genre: string, bahasa = ""): string {
   if (isIndonesian(bahasa) || g.includes("indo")) {
     const craft = readFile(path.join(REFS_DIR, "craft", "indonesia_lyric_craft.md"));
     if (craft) ctx += "\n\n# CRAFT PENULISAN LIRIK INDONESIA (ANTI-KAKU)\n" + craft;
+    const kontemporer = readFile(path.join(REFS_DIR, "craft", "indonesia_kontemporer_2020_2026.md"));
+    if (kontemporer) ctx += "\n\n# CRAFT LIRIK INDONESIA KONTEMPORER 2020-2026\n" + kontemporer;
   }
 
   const sunoGuide = readFile(path.join(REFS_DIR, "suno_prompt_guide.md"));
@@ -143,7 +145,7 @@ Rules for lyrics:
 - Lyrics must be written in the specified bahasa/language
 - Draw from the novel vocabulary banks for rich, non-generic imagery
 - Make it emotionally resonant with a strong hook
-- For Indonesian lyrics: write like someone SINGING/SPEAKING, not like an essay. Follow the "CRAFT PENULISAN LIRIK INDONESIA (ANTI-KAKU)" reference if present — prefer concrete imagery over abstract feeling-words, use conversational diction ("tak"/"kau" when intimate), use enjambment/fragments, never force a rhyme at the cost of meaning, and show emotion through scenes/objects instead of announcing it ("aku sedih"). Avoid the listed clichés.
+- For Indonesian lyrics: write like someone SINGING/SPEAKING, not like an essay. Follow the Indonesian CRAFT references if present. Contemporary standard (2020-2026): conversational/diary-style wins — everyday words made resonant through CONTEXT, not fancy vocabulary. Key rules: (a) pick ONE register and stay consistent — do NOT mix formal-poetic lines ("kutukar rindu per helai won") with casual ones ("lagi lembur", "kuintip dari HP") in the same song; (b) the chorus/hook must be the EASIEST line to sing and remember, never the most convoluted; (c) prefer concrete, ACCURATE detail (numbers, objects, places) over abstract feeling-words; (d) metaphors from near objects (kitchen, weather, streets, home), not langit/bintang/samudra; (e) never force a rhyme at the cost of meaning or clarity; (f) show emotion through scenes/objects, don't announce it ("aku sedih"). Avoid the listed clichés and tired tropes.
 
 Rules for Suno prompt:
 - Format: GENRE + MOOD + TEMPO + INSTRUMENTS + VOCALS + USE CASE
