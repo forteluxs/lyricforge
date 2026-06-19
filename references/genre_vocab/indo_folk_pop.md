@@ -72,3 +72,36 @@ membekas, menggenangi, menghantui, mencekam (kerinduan), meluap, mengalir, memba
 [Verse 2] — memperdalam konflik
 [Bridge] — titik paling intens / pertanyaan retoris
 [Final Chorus] — sama tapi terasa berbeda karena konteks
+
+---
+
+## DIKSI PERCAKAPAN NATURAL (ANTI-KAKU)
+*Pakai bentuk-bentuk ini biar lirik terasa diucapkan, bukan dikarang. Lihat juga `craft/indonesia_lyric_craft.md`.*
+
+### Pilih bentuk luwes saat nada intim
+- **tak** (bukan "tidak"), **kau / -mu** (bukan "engkau/dirimu"), **ku-/-ku** menempel
+- Urban/muda (indie pop, pop urban): boleh **nggak, udah, kayak, aja, biar, lagi (sedang), pengin, capek, pulang**
+- Hapus kata penghubung formal yang tak perlu: "adalah", "merupakan", "sehingga", "oleh karena itu"
+
+### Frasa pembuka verse yang terasa "ngomong"
+- "Katanya kau baik-baik saja..."
+- "Sudah lama aku tak..."
+- "Entah kenapa malam ini..."
+- "Mungkin aku cuma..."
+- "Kalau boleh jujur..."
+- "Pernah nggak kamu..."
+
+### Kata sambung ritme bicara (bukan formal)
+jadi, lalu, terus, tapi, soalnya, padahal, makanya, biar, sampai, sambil, sebelum, sebelum sempat
+
+### Partikel & sapaan penghangat
+-lah (secukupnya), -kah, ya, kok, sih, deh, kan; sapaan: Bun, Sayang, Kawan, Nak, Dik, kamu yang di sana
+
+### Kata sifat-rasa khas indie (yang sudah teruji, hindari klise)
+hampa, getir, lega, kalut, sunyi (bukan "sepi" melulu), ganjil, asing, hangat, samar, fana, rapuh, lapuk, retak, pelan, pasrah, rindu yang ganjil
+
+### Pola "tunjukkan, jangan umumkan" (show don't tell)
+- Alih-alih "aku rindu" → "kusisakan satu sisi ranjang"
+- Alih-alih "aku kecewa" → "kuhapus chat kita pelan-pelan, satu per satu"
+- Alih-alih "aku bahagia" → "hari ini aku ketawa tanpa alasan, dan tak apa-apa"
+- Alih-alih "kau berubah" → "kopimu sekarang pakai gula, aku saja yang masih pahit"

@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Load references once, reuse for all 15 songs
-  const references = loadReferences(genre);
+  const references = loadReferences(genre, bahasa);
 
   const encoder = new TextEncoder();
   let cancelled = false;

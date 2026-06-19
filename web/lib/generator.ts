@@ -31,9 +31,21 @@ function matchGenreVocab(genre: string): string[] {
   return matched.length ? matched : ["indo_folk_pop.md", "electronic_pop.md"];
 }
 
-export function loadReferences(genre: string): string {
+function isIndonesian(bahasa: string): boolean {
+  const b = bahasa.toLowerCase();
+  return ["indo", "indonesia", "bahasa", "melayu"].some(k => b.includes(k));
+}
+
+export function loadReferences(genre: string, bahasa = ""): string {
   let ctx = "";
   const g = genre.toLowerCase();
+
+  // Anti-kaku writing craft — load whenever the target language is Indonesian
+  // (or the genre itself is Indonesian). This teaches natural phrasing, not vocab.
+  if (isIndonesian(bahasa) || g.includes("indo")) {
+    const craft = readFile(path.join(REFS_DIR, "craft", "indonesia_lyric_craft.md"));
+    if (craft) ctx += "\n\n# CRAFT PENULISAN LIRIK INDONESIA (ANTI-KAKU)\n" + craft;
+  }
 
   const sunoGuide = readFile(path.join(REFS_DIR, "suno_prompt_guide.md"));
   if (sunoGuide) ctx += "\n\n# SUNO AI PROMPT GUIDE\n" + sunoGuide;
@@ -131,6 +143,7 @@ Rules for lyrics:
 - Lyrics must be written in the specified bahasa/language
 - Draw from the novel vocabulary banks for rich, non-generic imagery
 - Make it emotionally resonant with a strong hook
+- For Indonesian lyrics: write like someone SINGING/SPEAKING, not like an essay. Follow the "CRAFT PENULISAN LIRIK INDONESIA (ANTI-KAKU)" reference if present — prefer concrete imagery over abstract feeling-words, use conversational diction ("tak"/"kau" when intimate), use enjambment/fragments, never force a rhyme at the cost of meaning, and show emotion through scenes/objects instead of announcing it ("aku sedih"). Avoid the listed clichés.
 
 Rules for Suno prompt:
 - Format: GENRE + MOOD + TEMPO + INSTRUMENTS + VOCALS + USE CASE
