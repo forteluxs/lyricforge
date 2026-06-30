@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "genre, bahasa, dan narasi wajib diisi" }, { status: 400 });
     }
 
-    const references = loadReferences(genre, bahasa);
+    const references = loadReferences(genre, narasi, albumConcept);
     let userMessage = `Genre: ${genre}\nBahasa/Language: ${bahasa}\nNarasi/Tema: ${narasi}`;
 
     if (albumMode && songPosition) {

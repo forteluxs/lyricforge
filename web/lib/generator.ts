@@ -31,23 +31,12 @@ function matchGenreVocab(genre: string): string[] {
   return matched.length ? matched : ["indo_folk_pop.md", "electronic_pop.md"];
 }
 
-function isIndonesian(bahasa: string): boolean {
-  const b = bahasa.toLowerCase();
-  return ["indo", "indonesia", "bahasa", "melayu"].some(k => b.includes(k));
-}
-
-export function loadReferences(genre: string, bahasa = ""): string {
+export function loadReferences(genre: string, narasi: string = "", albumConcept: string = ""): string {
   let ctx = "";
   const g = genre.toLowerCase();
-
-  // Anti-kaku writing craft — load whenever the target language is Indonesian
-  // (or the genre itself is Indonesian). This teaches natural phrasing, not vocab.
-  if (isIndonesian(bahasa) || g.includes("indo")) {
-    const craft = readFile(path.join(REFS_DIR, "craft", "indonesia_lyric_craft.md"));
-    if (craft) ctx += "\n\n# CRAFT PENULISAN LIRIK INDONESIA (ANTI-KAKU)\n" + craft;
-    const kontemporer = readFile(path.join(REFS_DIR, "craft", "indonesia_kontemporer_2020_2026.md"));
-    if (kontemporer) ctx += "\n\n# CRAFT LIRIK INDONESIA KONTEMPORER 2020-2026\n" + kontemporer;
-  }
+  const n = narasi.toLowerCase();
+  const cConcept = albumConcept.toLowerCase();
+  const combined = `${g} ${n} ${cConcept}`;
 
   const sunoGuide = readFile(path.join(REFS_DIR, "suno_prompt_guide.md"));
   if (sunoGuide) ctx += "\n\n# SUNO AI PROMPT GUIDE\n" + sunoGuide;
@@ -73,7 +62,7 @@ export function loadReferences(genre: string, bahasa = ""): string {
   let novelLoaded = 0;
   for (const { file, kws } of novelPriority) {
     if (novelLoaded >= 3) break;
-    if (kws.some(kw => g.includes(kw))) {
+    if (kws.some(kw => combined.includes(kw))) {
       const c = readFile(path.join(novelVocabDir, file));
       if (c) { ctx += `\n\n# NOVEL VOCABULARY\n` + c; novelLoaded++; }
     }
@@ -87,6 +76,13 @@ export function loadReferences(genre: string, bahasa = ""): string {
 
   const classicDir = path.join(REFS_DIR, "classic_lyrics");
   const classicPriority = [
+    { file: "love.md", kws: ["love", "romance", "romantic", "cinta", "kasih", "sayang", "intimacy", "first glimpse", "devotion", "beloved", "kekasih", "pujaan"] },
+    { file: "heartbreak.md", kws: ["heartbreak", "breakup", "broken", "divorce", "split", "separated", "patah hati", "kecewa", "putus", "dikhianati", "betrayal", "regret", "luka", "hancur"] },
+    { file: "protest.md", kws: ["protest", "politics", "political", "war", "pacifism", "protes", "politik", "perang", "pemerintah", "government", "establishment", "inequality", "rights", "hak", "keadilan", "justice", "buruh", "strike", "riot", "pemberontakan"] },
+    { file: "life_and_death.md", kws: ["life", "death", "mortality", "existential", "hidup", "mati", "maut", "tua", "aging", "grief", "sedih", "depresi", "depression", "regret", "penyesalan"] },
+    { file: "people_and_places.md", kws: ["people", "places", "place", "city", "hometown", "escape", "road", "highway", "journey", "street", "suburbs", "town", "kota", "jalan", "pulang", "perjalanan", "kembali", "alamat"] },
+    { file: "sex.md", kws: ["sex", "sensual", "sensuality", "intimacy", "bed", "sweat", "desire", "lust", "seduction", "fumbling", "physical", "intim", "ranjang", "desah", "berkeringat", "gairah", "nafsu", "rayuan"] },
+    { file: "party.md", kws: ["party", "dance", "dancing", "dancefloor", "groove", "disco", "club", "nightclub", "celebration", "euphoria", "pesta", "dansa", "dendang", "lantai dansa", "disko", "ramai", "riuh", "dunia malam"] },
     { file: "indonesia.md", kws: ["indo","indonesia","dangdut","melayu"] },
     { file: "usa.md",       kws: ["folk rock","hip hop","rap","country","americana","blues","soul","r&b"] },
     { file: "uk.md",        kws: ["brit","rock","post punk","indie","alternative","shoegaze"] },
@@ -101,12 +97,12 @@ export function loadReferences(genre: string, bahasa = ""): string {
   let classicLoaded = 0;
   for (const { file, kws } of classicPriority) {
     if (classicLoaded >= 3) break;
-    if (kws.some(kw => g.includes(kw))) {
+    if (kws.some(kw => combined.includes(kw))) {
       const c = readFile(path.join(classicDir, file));
       if (c) { ctx += `\n\n# CLASSIC LYRICS (${file.replace(".md","").toUpperCase()})\n` + c; classicLoaded++; }
     }
   }
-  if (!g.includes("indo") && classicLoaded < 3) {
+  if (!combined.includes("indo") && classicLoaded < 3) {
     const c = readFile(path.join(classicDir, "indonesia.md"));
     if (c) ctx += "\n\n# CLASSIC LYRICS (INDONESIA)\n" + c;
   }
@@ -145,7 +141,6 @@ Rules for lyrics:
 - Lyrics must be written in the specified bahasa/language
 - Draw from the novel vocabulary banks for rich, non-generic imagery
 - Make it emotionally resonant with a strong hook
-- For Indonesian lyrics: write like someone SINGING/SPEAKING, not like an essay. Follow the Indonesian CRAFT references if present. Contemporary standard (2020-2026): conversational/diary-style wins — everyday words made resonant through CONTEXT, not fancy vocabulary. Key rules: (a) pick ONE register and stay consistent — do NOT mix formal-poetic lines ("kutukar rindu per helai won") with casual ones ("lagi lembur", "kuintip dari HP") in the same song; (b) the chorus/hook must be the EASIEST line to sing and remember, never the most convoluted; (c) prefer concrete, ACCURATE detail (numbers, objects, places) over abstract feeling-words; (d) metaphors from near objects (kitchen, weather, streets, home), not langit/bintang/samudra; (e) never force a rhyme at the cost of meaning or clarity; (f) show emotion through scenes/objects, don't announce it ("aku sedih"). Avoid the listed clichés and tired tropes.
 
 Rules for Suno prompt:
 - Format: GENRE + MOOD + TEMPO + INSTRUMENTS + VOCALS + USE CASE
